@@ -1,5 +1,6 @@
 import type { GameDoc } from "../../../shared/types";
 import { formatTime } from "../../../shared/math";
+import { TimelinePanel } from "./TimelinePanel";
 export function ResultDialog({
   doc,
   restart,
@@ -37,6 +38,10 @@ export function ResultDialog({
             </div>
           ))}
         </div>
+        <TimelinePanel
+          events={doc.timeline}
+          truncated={doc.timelineTruncated || doc.records[0]?.detailTruncated}
+        />
         <button className="primary" onClick={restart}>
           重新接入 ↗
         </button>

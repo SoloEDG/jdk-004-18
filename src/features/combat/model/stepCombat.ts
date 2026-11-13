@@ -15,6 +15,7 @@ export function stepCombat(
     shots: 0,
     collected: 0,
     weaponDamage: {},
+    timeline: [],
   };
   const player = doc.player;
   player.invincible = Math.max(0, player.invincible - dt);
@@ -41,7 +42,17 @@ export function stepCombat(
         segmentDistance(player, previous, bullet) <
         player.radius + bullet.radius
       ) {
-        events.taken += hurtPlayer(doc, bullet.damage);
+        const taken = hurtPlayer(doc, bullet.damage);
+        if (taken > 0) {
+          events.taken += taken;
+          events.timeline.push({
+            t: doc.time,
+            wave: doc.wave,
+            kind: "taken",
+            source: "projectile",
+            damage: taken,
+          });
+        }
         bullet.life = -1;
       }
       continue;
@@ -57,6 +68,15 @@ export function stepCombat(
       const damage = Math.min(enemy.hp, bullet.damage);
       enemy.hp -= damage;
       events.damage += damage;
+      events.timeline.push({
+        t: doc.time,
+        wave: doc.wave,
+        kind: "hit",
+        weapon: bullet.weapon,
+        target: enemy.id,
+        damage,
+        kill: enemy.hp <= 0,
+      });
       if (bullet.weapon !== "enemy")
         events.weaponDamage![bullet.weapon] =
           (events.weaponDamage![bullet.weapon] || 0) + damage;
@@ -73,8 +93,19 @@ export function stepCombat(
     }
   }
   for (const enemy of doc.enemies) {
-    if (enemy.hp > 0 && distance(enemy, player) < enemy.radius + player.radius)
-      events.taken += hurtPlayer(doc, enemy.kind === "elite" ? 25 : 12);
+    if (enemy.hp > 0 && distance(enemy, player) < enemy.radius + player.radius) {
+      const taken = hurtPlayer(doc, enemy.kind === "elite" ? 25 : 12);
+      if (taken > 0) {
+        events.taken += taken;
+        events.timeline.push({
+          t: doc.time,
+          wave: doc.wave,
+          kind: "taken",
+          source: "contact",
+          damage: taken,
+        });
+      }
+    }
   }
   doc.enemies = doc.enemies.filter((e) => e.hp > 0);
   doc.bullets = doc.bullets.filter(

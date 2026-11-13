@@ -992,3 +992,115 @@ footer .mono {
     font-size: 24px;
   }
 }
+.timeline-panel {
+  margin: 0 auto 22px;
+  max-width: 560px;
+  text-align: left;
+  border: 1px solid #2a3b33;
+  border-radius: 7px;
+  padding: 14px 16px;
+  background: #0d1614;
+}
+.timeline-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.timeline-head > span {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #9fd4ae;
+}
+.timeline-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.timeline-filters select {
+  background: #14231f;
+  color: #b9d2c0;
+  border: 1px solid #35503f;
+  border-radius: 4px;
+  font-size: 10px;
+  padding: 4px 6px;
+}
+.timeline-totals {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.timeline-totals > div {
+  background: #122019;
+  border: 1px solid #24402f;
+  border-radius: 5px;
+  padding: 7px 9px;
+}
+.timeline-totals strong {
+  display: block;
+  font:
+    15px "Space Grotesk",
+    sans-serif;
+  color: #c9f6d4;
+}
+.timeline-totals small {
+  font-size: 9px;
+  color: #7da88e;
+}
+.timeline-list {
+  max-height: 170px;
+  overflow-y: auto;
+  font-size: 10px;
+  color: #8fa89b;
+}
+.timeline-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid #1d2f26;
+}
+.timeline-row .mono {
+  color: #6f8f7c;
+  white-space: nowrap;
+}
+.timeline-empty {
+  font-size: 10px;
+  color: #67816f;
+  padding: 6px 0;
+}
+.truncated-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-style: normal;
+  color: #e8c98a;
+  border: 1px solid #6b5a2f;
+  border-radius: 4px;
+  padding: 3px 7px;
+  margin-bottom: 8px;
+}
+.timeline-head .truncated-badge {
+  margin-bottom: 0;
+}
+.history-row.clickable {
+  cursor: pointer;
+}
+.history-row.clickable:hover {
+  color: #d3ecd9;
+}
+.history-detail-toggle {
+  color: #7da88e;
+  font-size: 10px;
+}
+.history-detail {
+  padding: 12px 0 18px;
+}
+.history-detail .timeline-panel {
+  margin-bottom: 0;
+}
+.result-dialog {
+  max-height: 100%;
+  overflow-y: auto;
+}

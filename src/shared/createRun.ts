@@ -37,6 +37,8 @@ export function createRun(seed = 204004, records: RunRecord[] = []): GameDoc {
       byWeapon: { pulse: 0, orbit: 0, nova: 0 },
     },
     records,
+    timeline: [],
+    timelineTruncated: false,
     notice: "等待接入战场",
     victory: false,
   };

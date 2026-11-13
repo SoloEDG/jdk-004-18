@@ -52,6 +52,13 @@ export function collectDrops(
     if (distance(drop, doc.player) > doc.player.radius + 9) continue;
     drop.life = -1;
     events.collected++;
+    events.timeline.push({
+      t: doc.time,
+      wave: doc.wave,
+      kind: "pickup",
+      drop: drop.kind,
+      value: drop.value,
+    });
     if (drop.kind === "xp") grantExperience(doc, drop.value);
     if (drop.kind === "heal")
       doc.player.hp = Math.min(doc.player.maxHp, doc.player.hp + drop.value);
@@ -63,6 +70,13 @@ export function collectDrops(
         grantExperience(doc, drop.value);
         drop.life = -1;
         events.collected++;
+        events.timeline.push({
+          t: doc.time,
+          wave: doc.wave,
+          kind: "pickup",
+          drop: drop.kind,
+          value: drop.value,
+        });
       }
     }
   }

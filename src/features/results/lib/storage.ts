@@ -1,5 +1,13 @@
 import type { RunRecord } from "../../../shared/types";
 const STORAGE_KEY = "neon-survivor.records.v1";
+export type SaveStatus = "ok" | "truncated" | "failed";
+export interface KeyValueStore {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+function defaultStore(): KeyValueStore | null {
+  return typeof window === "undefined" ? null : window.localStorage;
+}
 function isRecord(value: unknown): value is RunRecord {
   if (!value || typeof value !== "object") return false;
   const r = value as RunRecord;
@@ -15,23 +23,51 @@ function isRecord(value: unknown): value is RunRecord {
     typeof r.victory === "boolean"
   );
 }
-export function loadRecords(): RunRecord[] {
+function sanitize(record: RunRecord): RunRecord {
+  // Detail is optional: records written by older versions stay summary-only.
+  if (record.timeline !== undefined && !Array.isArray(record.timeline)) {
+    const { timeline, ...rest } = record;
+    void timeline;
+    return rest;
+  }
+  return record;
+}
+export function loadRecords(
+  store: KeyValueStore | null = defaultStore(),
+): RunRecord[] {
   try {
-    if (typeof window === "undefined") return [];
-    const raw = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "[]");
-    return Array.isArray(raw) ? raw.filter(isRecord).slice(0, 20) : [];
+    if (!store) return [];
+    const raw = JSON.parse(store.getItem(STORAGE_KEY) || "[]");
+    return Array.isArray(raw)
+      ? raw.filter(isRecord).slice(0, 20).map(sanitize)
+      : [];
   } catch {
     return [];
   }
 }
-export function saveRecords(records: RunRecord[]): void {
+// Quota fallback: drop per-event detail but keep every total intact.
+export function stripDetails(records: RunRecord[]): RunRecord[] {
+  return records.map((r) =>
+    r.timeline ? { ...r, timeline: undefined, detailTruncated: true } : r,
+  );
+}
+export function saveRecords(
+  records: RunRecord[],
+  store: KeyValueStore | null = defaultStore(),
+): SaveStatus {
+  if (!store) return "failed";
+  const packed = records.slice(0, 20);
   try {
-    if (typeof window !== "undefined")
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(records.slice(0, 20)),
-      );
+    store.setItem(STORAGE_KEY, JSON.stringify(packed));
+    return "ok";
+  } catch {
+    /* A full store retries with summaries only. */
+  }
+  try {
+    store.setItem(STORAGE_KEY, JSON.stringify(stripDetails(packed)));
+    return "truncated";
   } catch {
     /* A full or disabled store cannot interrupt a run. */
+    return "failed";
   }
 }

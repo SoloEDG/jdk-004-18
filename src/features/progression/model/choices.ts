@@ -1,5 +1,6 @@
 import type { GameDoc, WeaponId } from "../../../shared/types";
 import { random } from "../../../shared/math";
+import { pushTimeline } from "../../../shared/timeline";
 import { UPGRADE_CATALOG } from "./catalog";
 export function rollChoices(doc: GameDoc): void {
   const available = UPGRADE_CATALOG.filter(
@@ -38,6 +39,13 @@ export function chooseUpgrade(doc: GameDoc, id: string): void {
       else doc.weapons.push({ id: id as WeaponId, level: 1, cooldown: 0 });
     }
   }
+  pushTimeline(doc, {
+    t: doc.time,
+    wave: doc.wave,
+    kind: "upgrade",
+    upgrade: id,
+    level: id === "recovery" ? undefined : doc.upgrades[id],
+  });
   doc.pendingLevels--;
   doc.choices = [];
   if (doc.pendingLevels > 0) rollChoices(doc);

@@ -54,6 +54,21 @@ export interface RunStats {
   shots: number;
   byWeapon: Record<WeaponId, number>;
 }
+export type TimelineKind = "hit" | "taken" | "pickup" | "upgrade";
+export interface TimelineEvent {
+  t: number;
+  wave: number;
+  kind: TimelineKind;
+  weapon?: WeaponId | "enemy";
+  target?: number;
+  damage?: number;
+  kill?: boolean;
+  source?: "projectile" | "contact";
+  drop?: Drop["kind"];
+  value?: number;
+  upgrade?: string;
+  level?: number;
+}
 export interface RunRecord {
   id: string;
   duration: number;
@@ -63,6 +78,10 @@ export interface RunRecord {
   damage: number;
   weapons: string[];
   victory: boolean;
+  taken?: number;
+  collected?: number;
+  timeline?: TimelineEvent[];
+  detailTruncated?: boolean;
 }
 export interface GameDoc {
   version: 1;
@@ -86,6 +105,8 @@ export interface GameDoc {
   spawnBudget: number;
   stats: RunStats;
   records: RunRecord[];
+  timeline: TimelineEvent[];
+  timelineTruncated: boolean;
   notice: string;
   victory: boolean;
 }
@@ -106,6 +127,7 @@ export interface FrameEvents {
   taken: number;
   shots: number;
   collected: number;
+  timeline: TimelineEvent[];
 }
 export const WIDTH = 1000;
 export const HEIGHT = 650;

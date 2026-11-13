@@ -10,5 +10,6 @@ export function stepResults(doc: GameDoc, events: FrameEvents): void {
   doc.choices = [];
   doc.notice = doc.victory ? "撤离成功 · 信号保全" : "信号中断 · 再次连接";
   doc.records = [makeRecord(doc), ...doc.records].slice(0, 20);
-  saveRecords(doc.records);
+  if (saveRecords(doc.records) === "truncated")
+    doc.notice = "本地存储已满 · 战斗明细已截断，总数完整保留";
 }
